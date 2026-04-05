@@ -1,0 +1,262 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
+  html, body { margin: 0; padding: 0; background: #191919 !important; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .wrap { background: #191919; min-height: 100vh; font-family: 'DM Mono', monospace; }
+
+  .setup-panel { padding: 2rem 2rem 1.6rem; border-bottom: 1px solid #252525; }
+  .setup-title { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; color: #555; text-transform: uppercase; margin-bottom: 1rem; }
+
+  .event-input { background: #242424; border: 1px solid #333; border-radius: 7px; color: #ccc; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s; margin-bottom: 10px; }
+  .event-input:focus { border-color: #555; color: #eee; }
+  .event-input::placeholder { color: #383838; }
+
+  .fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .field-label-row { display: flex; align-items: center; gap: 0; height: 14px; }
+  .field-label { font-size: 10px; letter-spacing: 0.12em; color: #555; text-transform: uppercase; font-family: 'DM Mono', monospace; line-height: 1; }
+
+  .toggle-wrap { display: flex; align-items: center; gap: 5px; margin-left: 7px; }
+  .toggle-track { width: 24px; height: 12px; background: #2e2e2e; border-radius: 6px; cursor: pointer; position: relative; transition: background 0.2s; border: 1px solid #3a3a3a; flex-shrink: 0; }
+  .toggle-track.on { background: #3a3230; border-color: #e8c87a44; }
+  .toggle-thumb { width: 8px; height: 8px; background: #444; border-radius: 50%; position: absolute; top: 1px; left: 1px; transition: left 0.2s, background 0.2s; }
+  .toggle-track.on .toggle-thumb { left: 13px; background: #e8c87a88; }
+  .toggle-label { font-size: 9px; color: #3a3a3a; font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; cursor: pointer; }
+  .toggle-track.on + .toggle-label { color: #e8c87a66; }
+
+  .field-input { background: #242424; border: 1px solid #333; border-radius: 7px; color: #ccc; font-family: 'DM Mono', monospace; font-size: 13px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s, opacity 0.2s; }
+  .field-input:focus { border-color: #555; color: #eee; }
+  .field-input:disabled { opacity: 0.2; pointer-events: none; }
+  .field-input.error { border-color: #c0392b; animation: shake 0.35s ease; }
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.3); cursor: pointer; }
+
+  .start-btn { width: 100%; background: #242424; border: 1px solid #e8c87a33; border-radius: 7px; color: #e8c87a; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; padding: 9px; cursor: pointer; text-transform: uppercase; transition: background 0.15s; }
+  .start-btn:hover { background: #2e2e2e; }
+
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+  .timer-panel { padding: 2rem 2rem 1.8rem; background: #191919; }
+  .header-area { margin-bottom: 1.6rem; cursor: pointer; display: inline-block; }
+  .header-area:hover .date-display { color: #777; }
+  .event-name-display { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: #666; text-transform: uppercase; margin-bottom: 3px; }
+  .date-display { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: #555; letter-spacing: 0.02em; display: inline-block; transition: color 0.15s; }
+
+  .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.4rem; transition: opacity 0.4s; }
+  .unit-block { background: #252525; border: 1px solid #303030; border-radius: 10px; padding: 1rem 0.4rem 0.8rem; text-align: center; position: relative; overflow: hidden; }
+  .unit-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent); }
+  .days-block { transition: border-color 0.5s ease; }
+  .unit-num { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; color: #f0f0f0; line-height: 1; letter-spacing: -0.02em; display: block; transition: color 3s ease; }
+  .unit-lbl { font-size: 9px; letter-spacing: 0.2em; color: #444; text-transform: uppercase; margin-top: 5px; display: block; font-family: 'DM Mono', monospace; }
+
+  .footer-row { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+  .footer-time { font-size: 11px; color: #555; letter-spacing: 0.05em; font-family: 'DM Mono', monospace; font-variant-numeric: tabular-nums; }
+  .tz-dots { display: flex; gap: 3px; align-items: center; cursor: pointer; padding: 2px 0; }
+  .tz-dot { width: 3px; height: 3px; border-radius: 50%; background: #444; transition: background 0.15s; }
+  .tz-dots:hover .tz-dot { background: #777; }
+  .tz-menu { display: none; position: absolute; bottom: 28px; right: 0; background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 7px; overflow: hidden; min-width: 80px; }
+  .tz-menu.open { display: block; }
+  .tz-option { font-family: 'DM Mono', monospace; font-size: 11px; color: #555; padding: 6px 12px; cursor: pointer; transition: background 0.1s, color 0.1s; white-space: nowrap; }
+  .tz-option:hover { background: #252525; color: #aaa; }
+  .tz-option.selected { color: #e8c87a88; }
+  .footer-tz-wrap { position: relative; display: flex; align-items: center; }
+
+  .timesup { display: none; text-align: center; padding: 0.5rem 0 0.8rem; }
+  .timesup-text { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: #666; text-transform: uppercase; }
+  .timesup-sub { font-size: 11px; color: #444; margin-top: 4px; letter-spacing: 0.06em; cursor: pointer; transition: color 0.15s; font-family: 'DM Mono', monospace; }
+  .timesup-sub:hover { color: #777; }
+
+  @media (max-width: 380px) { .unit-num { font-size: 1.8rem; } .fields-row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <div class="setup-panel" id="setup-panel">
+    <div class="setup-title">New countdown</div>
+    <input class="event-input" id="event-name-input" type="text" placeholder="What are you counting down to?" maxlength="40" />
+    <div class="fields-row">
+      <div class="field-group">
+        <div class="field-label-row"><span class="field-label">Date</span></div>
+        <input class="field-input" id="date-input" type="date" />
+      </div>
+      <div class="field-group">
+        <div class="field-label-row">
+          <span class="field-label">Time</span>
+          <div class="toggle-wrap" onclick="toggleNoTime()">
+            <div class="toggle-track" id="toggle-track"><div class="toggle-thumb"></div></div>
+            <span class="toggle-label" id="toggle-label">skip</span>
+          </div>
+        </div>
+        <input class="field-input" id="time-input" type="time" value="00:00" />
+      </div>
+    </div>
+    <button class="start-btn" onclick="startTimer()">Start countdown</button>
+  </div>
+
+  <div class="timer-panel" id="timer-panel" style="display:none;">
+    <div class="header-area" onclick="editTimer()" title="Click to edit">
+      <div class="event-name-display" id="display-name">Countdown</div>
+      <div class="date-display" id="date-display"></div>
+    </div>
+    <div class="countdown-grid" id="countdown-grid">
+      <div class="unit-block days-block" id="block-d"><span class="unit-num" id="days">--</span><span class="unit-lbl">days</span></div>
+      <div class="unit-block" id="block-h"><span class="unit-num" id="hours">--</span><span class="unit-lbl">hours</span></div>
+      <div class="unit-block" id="block-m"><span class="unit-num" id="mins">--</span><span class="unit-lbl">mins</span></div>
+      <div class="unit-block" id="block-s"><span class="unit-num" id="secs">--</span><span class="unit-lbl">secs</span></div>
+    </div>
+    <div class="timesup" id="timesup">
+      <div class="timesup-text" id="timesup-label">time's up</div>
+      <div class="timesup-sub" onclick="editTimer()">set a new countdown</div>
+    </div>
+    <div class="footer-row">
+      <span class="footer-time" id="footer-time"></span>
+      <div class="footer-tz-wrap">
+        <div class="tz-dots" id="tz-dots" onclick="toggleTZMenu()">
+          <div class="tz-dot"></div><div class="tz-dot"></div><div class="tz-dot"></div>
+        </div>
+        <div class="tz-menu" id="tz-menu">
+          <div class="tz-option selected" data-tz="America/New_York" onclick="setTZ(this)">EST / EDT</div>
+          <div class="tz-option" data-tz="America/Chicago" onclick="setTZ(this)">CST / CDT</div>
+          <div class="tz-option" data-tz="America/Denver" onclick="setTZ(this)">MST / MDT</div>
+          <div class="tz-option" data-tz="America/Los_Angeles" onclick="setTZ(this)">PST / PDT</div>
+          <div class="tz-option" data-tz="Asia/Kolkata" onclick="setTZ(this)">IST</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let targetTS=null, interval=null, clockInterval=null;
+  let prevS=-1, prevM=-1, prevH=-1;
+  let savedName='', savedDate='', savedTime='';
+  let noTime=false, currentTZ='America/New_York';
+
+  document.getElementById('date-input').min = new Date().toISOString().split('T')[0];
+
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('tz-menu');
+    if (!document.getElementById('tz-dots').contains(e.target)) menu.classList.remove('open');
+  });
+
+  function pad(n){ return String(Math.floor(n)).padStart(2,'0'); }
+
+  function toggleNoTime(){
+    noTime=!noTime;
+    const track=document.getElementById('toggle-track');
+    const lbl=document.getElementById('toggle-label');
+    const inp=document.getElementById('time-input');
+    track.classList.toggle('on', noTime);
+    lbl.textContent = noTime ? 'skip' : 'skip';
+    inp.disabled = noTime;
+  }
+
+  function toggleTZMenu(){ document.getElementById('tz-menu').classList.toggle('open'); }
+
+  function setTZ(el){
+    currentTZ = el.dataset.tz;
+    document.querySelectorAll('.tz-option').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('tz-menu').classList.remove('open');
+  }
+
+  function lerpColor(r1,g1,b1,r2,g2,b2,t){
+    return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
+  }
+
+  function getDaysColor(days){
+    if(days>=30) return 'rgb(240,240,240)';
+    if(days>=14){const t=(30-days)/16; return lerpColor(240,240,240,240,130,50,t);}
+    if(days>=7) {const t=(14-days)/7;  return lerpColor(240,130,50,255,30,10,t);}
+    if(days>=3) {const t=(7-days)/4;   return lerpColor(255,30,10,220,0,0,t);}
+    const t=(3-Math.max(0,days))/3; return lerpColor(220,0,0,160,0,0,t);
+  }
+
+  function pulseDays(color){
+    const el=document.getElementById('block-d');
+    el.style.borderColor=color.replace('rgb(','rgba(').replace(')',',0.45)');
+    setTimeout(()=>{el.style.borderColor='';},500);
+  }
+
+  function formatDateLabel(dateStr,timeStr,noT){
+    const [y,mo,d]=dateStr.split('-').map(Number);
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let label=`${months[mo-1]} ${d}, ${y}`;
+    if(!noT && timeStr && timeStr!=='00:00'){
+      const [h,mi]=timeStr.split(':').map(Number);
+      label+=`  ·  ${pad(h%12||12)}:${pad(mi)} ${h>=12?'PM':'AM'}`;
+    }
+    return label;
+  }
+
+  function triggerError(el){
+    el.classList.remove('error'); void el.offsetWidth; el.classList.add('error');
+    setTimeout(()=>el.classList.remove('error'),400);
+  }
+
+  function startClock(){
+    if(clockInterval) clearInterval(clockInterval);
+    function tick(){
+      try{
+        const d=new Date(new Date().toLocaleString('en-US',{timeZone:currentTZ}));
+        const h=d.getHours(),m=d.getMinutes(),s=d.getSeconds();
+        document.getElementById('footer-time').textContent=pad(h%12||12)+':'+pad(m)+':'+pad(s)+' '+(h>=12?'PM':'AM');
+      }catch(e){}
+    }
+    tick(); clockInterval=setInterval(tick,1000);
+  }
+
+  function startTimer(){
+    const dateVal=document.getElementById('date-input').value;
+    const timeVal=noTime?'00:00':(document.getElementById('time-input').value||'00:00');
+    const nameVal=document.getElementById('event-name-input').value.trim()||'Countdown';
+    if(!dateVal){triggerError(document.getElementById('date-input'));return;}
+    savedName=nameVal; savedDate=dateVal; savedTime=noTime?'':timeVal;
+    const [y,mo,d]=dateVal.split('-').map(Number);
+    const [h,mi]=timeVal.split(':').map(Number);
+    targetTS=new Date(y,mo-1,d,h,mi,0).getTime();
+    document.getElementById('display-name').textContent=nameVal;
+    document.getElementById('date-display').textContent=formatDateLabel(dateVal,timeVal,noTime);
+    document.getElementById('timesup').style.display='none';
+    document.getElementById('countdown-grid').style.opacity='1';
+    document.getElementById('setup-panel').style.display='none';
+    document.getElementById('timer-panel').style.display='block';
+    prevS=-1;prevM=-1;prevH=-1;
+    if(interval) clearInterval(interval);
+    startClock(); tickDown(); interval=setInterval(tickDown,1000);
+  }
+
+  function editTimer(){
+    if(interval) clearInterval(interval);
+    if(clockInterval) clearInterval(clockInterval);
+    document.getElementById('event-name-input').value=savedName;
+    document.getElementById('date-input').value=savedDate;
+    if(!savedTime){if(!noTime)toggleNoTime();}
+    else{if(noTime)toggleNoTime(); document.getElementById('time-input').value=savedTime;}
+    document.getElementById('timer-panel').style.display='none';
+    document.getElementById('setup-panel').style.display='block';
+  }
+
+  function tickDown(){
+    const now=Date.now(), diff=targetTS-now;
+    if(diff<=0){
+      ['days','hours','mins','secs'].forEach(id=>document.getElementById(id).textContent='00');
+      document.getElementById('days').style.color='rgb(160,0,0)';
+      document.getElementById('countdown-grid').style.opacity='0.3';
+      document.getElementById('timesup').style.display='block';
+      document.getElementById('timesup-label').textContent=(savedName||'your event')+' is here';
+      if(interval) clearInterval(interval); return;
+    }
+    document.getElementById('countdown-grid').style.opacity='1';
+    const ts=Math.floor(diff/1000);
+    const s=ts%60,m=Math.floor(ts/60)%60,h=Math.floor(ts/3600)%24,days=Math.floor(ts/86400);
+    const dc=getDaysColor(days);
+    document.getElementById('days').textContent=pad(days);
+    document.getElementById('days').style.color=dc;
+    pulseDays(dc);
+    if(s!==prevS){document.getElementById('secs').textContent=pad(s);prevS=s;}
+    if(m!==prevM){document.getElementById('mins').textContent=pad(m);prevM=m;}
+    if(h!==prevH){document.getElementById('hours').textContent=pad(h);prevH=h;}
+  }
+</script>
