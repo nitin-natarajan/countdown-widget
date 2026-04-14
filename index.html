@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── SETUP ── -->
+  <div class="setup-panel" id="setup-panel" style="display:none;">
+    <div class="setup-title">New countdown</div>
+    <input class="event-input" id="event-name-input" type="text" placeholder="What are you counting down to?" maxlength="40" />
+    <div class="fields-row">
+      <div class="field-group">
+        <div class="field-label-row"><span class="field-label">Date</span></div>
+        <input class="field-input" id="date-input" type="date" />
+      </div>
+      <div class="field-group">
+        <div class="field-label-row">
+          <span class="field-label">Time</span>
+          <div class="toggle-wrap" onclick="toggleNoTime()">
+            <div class="toggle-track" id="toggle-track"><div class="toggle-thumb"></div></div>
+            <span class="toggle-label" id="toggle-label">skip</span>
+          </div>
+        </div>
+        <input class="field-input" id="time-input" type="time" value="00:00" />
+      </div>
+    </div>
+    <button class="start-btn" onclick="startTimer()">Start countdown</button>
+  </div>
+
+  <!-- ── ACTIVE TIMER ── -->
+  <div class="timer-panel" id="timer-panel" style="display:none;">
+    <div class="header-area" onclick="editTimer()" title="Click to edit">
+      <div class="event-name-display" id="display-name"></div>
+      <div class="date-display" id="date-display"></div>
+    </div>
+    <div class="countdown-grid" id="countdown-grid">
+      <div class="unit-block days-block" id="block-d">
+        <span class="unit-num" id="days">--</span>
+        <span class="unit-lbl">days</span>
+      </div>
+      <div class="unit-block" id="block-h">
+        <span class="unit-num" id="hours">--</span>
+        <span class="unit-lbl">hours</span>
+      </div>
+      <div class="unit-block" id="block-m">
+        <span class="unit-num" id="mins">--</span>
+        <span class="unit-lbl">mins</span>
+      </div>
+      <div class="unit-block" id="block-s">
+        <span class="unit-num" id="secs">--</span>
+        <span class="unit-lbl">secs</span>
+      </div>
+    </div>
+    <div class="footer-row">
+      <span class="footer-time" id="footer-time"></span>
+      <div class="footer-tz-wrap">
+        <div class="tz-dots" onclick="toggleTZMenu('tz-menu')">
+          <div class="tz-dot"></div><div class="tz-dot"></div><div class="tz-dot"></div>
+        </div>
+        <div class="tz-menu" id="tz-menu">
+          <div class="tz-option selected" data-tz="America/New_York"    onclick="setTZ(this)">EST / EDT</div>
+          <div class="tz-option"          data-tz="America/Chicago"     onclick="setTZ(this)">CST / CDT</div>
+          <div class="tz-option"          data-tz="America/Denver"      onclick="setTZ(this)">MST / MDT</div>
+          <div class="tz-option"          data-tz="America/Los_Angeles" onclick="setTZ(this)">PST / PDT</div>
+          <div class="tz-option"          data-tz="Asia/Kolkata"        onclick="setTZ(this)">IST</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TIMES UP ── -->
+  <div class="timesup-panel" id="timesup-panel" style="display:none;">
+    <div class="timesup-event"    id="timesup-event"></div>
+    <div class="timesup-headline" id="timesup-headline"></div>
+    <div class="elapsed-label">time elapsed since</div>
+    <div class="elapsed-grid">
+      <div class="elapsed-block"><span class="elapsed-num" id="el-days">00</span><span class="elapsed-lbl">days</span></div>
+      <div class="elapsed-block"><span class="elapsed-num" id="el-hours">00</span><span class="elapsed-lbl">hours</span></div>
+      <div class="elapsed-block"><span class="elapsed-num" id="el-mins">00</span><span class="elapsed-lbl">mins</span></div>
+      <div class="elapsed-block"><span class="elapsed-num" id="el-secs">00</span><span class="elapsed-lbl">secs</span></div>
+    </div>
+    <div class="footer-row" style="margin-bottom:1rem;">
+      <button class="reset-btn" onclick="resetTimer()">set new countdown</button>
+    </div>
+    <div class="footer-row">
+      <span class="footer-time" id="footer-time-tu"></span>
+      <div class="footer-tz-wrap">
+        <div class="tz-dots" onclick="toggleTZMenu('tz-menu-tu')">
+          <div class="tz-dot"></div><div class="tz-dot"></div><div class="tz-dot"></div>
+        </div>
+        <div class="tz-menu" id="tz-menu-tu">
+          <div class="tz-option selected" data-tz="America/New_York"    onclick="setTZ(this)">EST / EDT</div>
+          <div class="tz-option"          data-tz="America/Chicago"     onclick="setTZ(this)">CST / CDT</div>
+          <div class="tz-option"          data-tz="America/Denver"      onclick="setTZ(this)">MST / MDT</div>
+          <div class="tz-option"          data-tz="America/Los_Angeles" onclick="setTZ(this)">PST / PDT</div>
+          <div class="tz-option"          data-tz="Asia/Kolkata"        onclick="setTZ(this)">IST</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

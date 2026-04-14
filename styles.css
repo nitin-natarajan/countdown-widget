@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Mono:wght@300;400;500&family=Roboto+Mono:wght@300;400;500&family=Share+Tech+Mono&display=swap');
+
+html, body { margin: 0; padding: 0; background: #191919; min-height: 100vh; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.wrap { background: #191919; min-height: 100vh; font-family: 'DM Mono', monospace; }
+
+/* ─── SETUP PANEL ─── */
+.setup-panel { padding: 2rem 2rem 1.6rem; border-bottom: 1px solid #252525; }
+.setup-title { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; color: #555; text-transform: uppercase; margin-bottom: 1rem; }
+
+.event-input { background: #242424; border: 1px solid #333; border-radius: 7px; color: #ccc; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s; margin-bottom: 10px; }
+.event-input:focus { border-color: #555; color: #eee; }
+.event-input::placeholder { color: #383838; }
+
+.fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label-row { display: flex; align-items: center; height: 14px; }
+.field-label { font-size: 10px; letter-spacing: 0.12em; color: #555; text-transform: uppercase; font-family: 'DM Mono', monospace; line-height: 1; }
+
+.toggle-wrap { display: flex; align-items: center; gap: 5px; margin-left: 7px; }
+.toggle-track { width: 24px; height: 12px; background: #2e2e2e; border-radius: 6px; cursor: pointer; position: relative; transition: background 0.2s; border: 1px solid #3a3a3a; flex-shrink: 0; }
+.toggle-track.on { background: #3a3230; border-color: #e8c87a44; }
+.toggle-thumb { width: 8px; height: 8px; background: #444; border-radius: 50%; position: absolute; top: 1px; left: 1px; transition: left 0.2s, background 0.2s; }
+.toggle-track.on .toggle-thumb { left: 13px; background: #e8c87a88; }
+.toggle-label { font-size: 9px; color: #3a3a3a; font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.toggle-track.on + .toggle-label { color: #e8c87a66; }
+
+.field-input { background: #242424; border: 1px solid #333; border-radius: 7px; color: #ccc; font-family: 'DM Mono', monospace; font-size: 13px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 0.2s, opacity 0.2s; }
+.field-input:focus { border-color: #555; color: #eee; }
+.field-input:disabled { opacity: 0.2; pointer-events: none; }
+.field-input.error { border-color: #c0392b; animation: shake 0.35s ease; }
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.3); cursor: pointer; }
+
+.start-btn { width: 100%; background: #242424; border: 1px solid #e8c87a33; border-radius: 7px; color: #e8c87a; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; padding: 9px; cursor: pointer; text-transform: uppercase; transition: background 0.15s; }
+.start-btn:hover { background: #2e2e2e; }
+
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+/* ─── ACTIVE TIMER ─── */
+.timer-panel { padding: 2rem 2rem 1.8rem; background: #191919; }
+.header-area { margin-bottom: 1.6rem; cursor: pointer; display: inline-block; }
+.header-area:hover .date-display { color: #777; }
+.event-name-display { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: #666; text-transform: uppercase; margin-bottom: 3px; }
+.date-display { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: #555; letter-spacing: 0.02em; display: inline-block; transition: color 0.15s; }
+
+.countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.4rem; transition: opacity 0.4s; }
+.unit-block { background: #252525; border: 1px solid #303030; border-radius: 10px; padding: 1rem 0.4rem 0.8rem; text-align: center; position: relative; overflow: hidden; }
+.unit-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent); }
+.days-block { transition: border-color 0.5s ease; }
+
+.unit-num { font-size: 2.5rem; font-weight: 800; color: #f0f0f0; line-height: 1; letter-spacing: -0.02em; display: block; transition: color 3s ease; }
+.unit-lbl { font-size: 9px; letter-spacing: 0.2em; color: #444; text-transform: uppercase; margin-top: 5px; display: block; font-family: 'DM Mono', monospace; }
+
+/* ─────────────────────────────────────────────────────────────
+   CLOCK NUMBER FONT — change the font-family below to swap it.
+
+   OPTIONS TO TRY (all loaded above via Google Fonts):
+   1. 'Syne', sans-serif          → current default (geometric, bold)
+   2. 'Space Mono', monospace     → techy, square, very readable
+   3. 'IBM Plex Mono', monospace  → clean, engineered, neutral
+   4. 'Roboto Mono', monospace    → friendly, modern, balanced
+   5. 'Courier Prime', serif      → classic typewriter warmth
+   6. 'Share Tech Mono', monospace → sharp, terminal-style
+   7. 'DM Mono', monospace        → matches the rest of the UI
+───────────────────────────────────────────────────────────── */
+.unit-num {
+  font-family: 'Syne', sans-serif; /* ← CHANGE THIS LINE */
+}
+
+/* ─── TIMES UP PANEL ─── */
+.timesup-panel { padding: 2rem 2rem 1.8rem; background: #191919; display: none; }
+.timesup-event { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: #666; text-transform: uppercase; margin-bottom: 3px; }
+.timesup-headline { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #555; margin-bottom: 1.6rem; }
+
+.elapsed-label { font-family: 'Syne', sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 0.2em; color: #3a3a3a; text-transform: uppercase; margin-bottom: 8px; }
+.elapsed-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.4rem; }
+.elapsed-block { background: #1e1e1e; border: 1px solid #272727; border-radius: 10px; padding: 1rem 0.4rem 0.8rem; text-align: center; position: relative; overflow: hidden; }
+.elapsed-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(160,0,0,0.2), transparent); }
+.elapsed-num { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; color: #4a1010; line-height: 1; letter-spacing: -0.02em; display: block; }
+.elapsed-lbl { font-size: 9px; letter-spacing: 0.2em; color: #2e2e2e; text-transform: uppercase; margin-top: 5px; display: block; font-family: 'DM Mono', monospace; }
+
+.reset-btn { background: none; border: 1px solid #2a2a2a; border-radius: 6px; color: #3a3a3a; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 6px 14px; cursor: pointer; text-transform: uppercase; transition: all 0.15s; }
+.reset-btn:hover { border-color: #444; color: #666; }
+
+/* ─── FOOTER ─── */
+.footer-row { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.footer-time { font-size: 11px; color: #555; letter-spacing: 0.05em; font-family: 'DM Mono', monospace; font-variant-numeric: tabular-nums; }
+
+.tz-dots { display: flex; gap: 3px; align-items: center; cursor: pointer; padding: 2px 0; }
+.tz-dot { width: 3px; height: 3px; border-radius: 50%; background: #444; transition: background 0.15s; }
+.tz-dots:hover .tz-dot { background: #777; }
+.tz-menu { display: none; position: absolute; bottom: 28px; right: 0; background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 7px; overflow: hidden; min-width: 80px; z-index: 10; }
+.tz-menu.open { display: block; }
+.tz-option { font-family: 'DM Mono', monospace; font-size: 11px; color: #555; padding: 6px 12px; cursor: pointer; transition: background 0.1s, color 0.1s; white-space: nowrap; }
+.tz-option:hover { background: #252525; color: #aaa; }
+.tz-option.selected { color: #e8c87a88; }
+.footer-tz-wrap { position: relative; display: flex; align-items: center; }
+
+@media (max-width: 380px) { .unit-num, .elapsed-num { font-size: 1.8rem; } .fields-row { grid-template-columns: 1fr; } }
