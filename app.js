@@ -1,11 +1,10 @@
 /* ─────────────────────────────────────────────────────────────
    countdown/app.js
-   All logic for the countdown timer widget.
 ───────────────────────────────────────────────────────────── */
 
 const STORAGE_KEY = 'countdown_state';
 
-let interval    = null;
+let interval      = null;
 let clockInterval = null;
 let prevS = -1, prevM = -1, prevH = -1;
 let noTime    = false;
@@ -24,10 +23,30 @@ function nowInTZ(tz) {
   return new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
 }
 
+/*
+  getTargetTS — correctly converts a wall-clock date/time in a given
+  timezone to a UTC timestamp.
+
+  Strategy: build an ISO-like string and use toLocaleString to find
+  what UTC offset the timezone has at that exact moment, then invert it.
+*/
 function getTargetTS(year, month, day, hour, min, tz) {
-  const approxUTC = Date.UTC(year, month - 1, day, hour, min, 0);
-  const tzDate    = new Date(new Date(approxUTC).toLocaleString('en-US', { timeZone: tz }));
-  return approxUTC + (approxUTC - tzDate.getTime());
+  // Step 1: make a naive UTC date using the target wall-clock values
+  const naiveUTC = Date.UTC(year, month - 1, day, hour, min, 0);
+
+  // Step 2: ask JS what wall-clock time that naive UTC maps to in the target TZ
+  const asLocal = new Date(naiveUTC).toLocaleString('en-US', { timeZone: tz,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+  // Step 3: parse that back to a Date to get the offset
+  const tzDate = new Date(asLocal);
+
+  // Step 4: the offset tells us how far off our naive guess was
+  const offset = naiveUTC - tzDate.getTime();
+
+  // Step 5: apply offset once to correct the naive UTC
+  return naiveUTC + offset;
 }
 
 function formatDateLabel(dateStr, timeStr, noT) {
@@ -152,7 +171,8 @@ function showTimesUp() {
   document.getElementById('timer-panel').style.display   = 'none';
   document.getElementById('timesup-panel').style.display = 'block';
   document.getElementById('timesup-event').textContent    = state.name;
-  document.getElementById('timesup-headline').textContent = formatDateLabel(state.dateStr, state.timeStr || '00:00', state.noTime) + ' has passed.';
+  document.getElementById('timesup-headline').textContent =
+    formatDateLabel(state.dateStr, state.timeStr || '00:00', state.noTime) + ' has passed.';
 
   currentTZ = state.tz || 'America/New_York';
   if (interval)      clearInterval(interval);
@@ -211,13 +231,13 @@ function tickDown() {
   const days = Math.floor(ts / 86400);
 
   const dc = getDaysColor(days);
-  document.getElementById('days').textContent  = pad(days);
-  document.getElementById('days').style.color  = dc;
+  document.getElementById('days').textContent = pad(days);
+  document.getElementById('days').style.color = dc;
   pulseDays(dc);
 
-  if (s !== prevS) { document.getElementById('secs').textContent  = pad(s);  prevS = s; }
-  if (m !== prevM) { document.getElementById('mins').textContent  = pad(m);  prevM = m; }
-  if (h !== prevH) { document.getElementById('hours').textContent = pad(h);  prevH = h; }
+  if (s !== prevS) { document.getElementById('secs').textContent  = pad(s); prevS = s; }
+  if (m !== prevM) { document.getElementById('mins').textContent  = pad(m); prevM = m; }
+  if (h !== prevH) { document.getElementById('hours').textContent = pad(h); prevH = h; }
 }
 
 function tickElapsed() {
@@ -234,17 +254,12 @@ function tickElapsed() {
   document.getElementById('el-secs').textContent  = pad(s);
 }
 
-/* ─────────────────────────────────────────────────────────────
-   CROSS-TAB / CROSS-WINDOW SYNC
-   When the state is saved in another tab (or the Notion embed),
-   this fires and updates the current window automatically.
-───────────────────────────────────────────────────────────── */
+/* ── Cross-tab sync ── */
 window.addEventListener('storage', function(e) {
   if (e.key !== STORAGE_KEY) return;
   if (!e.newValue) { resetTimer(); return; }
   try {
-    const incoming = JSON.parse(e.newValue);
-    state = incoming;
+    state = JSON.parse(e.newValue);
     const targetTS = getTargetTS(state.year, state.month, state.day, state.hour, state.min, state.tz || currentTZ);
     if (Date.now() >= targetTS) { showTimesUp(); } else { showTimerPanel(); }
   } catch(ex) {}
